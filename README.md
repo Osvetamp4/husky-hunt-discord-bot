@@ -1,0 +1,1 @@
+# husky-hunt-discord-bot
