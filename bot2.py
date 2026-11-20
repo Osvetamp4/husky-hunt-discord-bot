@@ -41,6 +41,16 @@ def configured_channel_id(name):
 channel_id = configured_channel_id("CHANNEL_ID")
 craft_id = configured_channel_id("CRAFT_ID")
 
+def get_destination_folder(message_content):
+    if not message_content:
+        return None
+
+    prefix = message_content.strip()[:1].upper()
+    if not prefix.isalpha():
+        return None
+
+    return os.getenv(f"DRIVE_FOLDER_{prefix}")
+
 def upload_file(parent, drive_service, filename, mimetype, upload_filename, resumable=True): #, chunksize=262144):
         try:
             media = MediaIoBaseUpload(filename, mimetype=mimetype, resumable=resumable) #, chunksize=chunksize)
@@ -89,72 +99,18 @@ async def on_message(message):
                     ext = os.path.splitext(original_filename)[1]
 
                     new_filename = f"{message.content}{ext}"
+                    parent = get_destination_folder(message.content)
 
-                    parent = None
-
-                    # if message.content.startswith("T"):
-                    #     print("Message starts with T")
-                    #     parent = "1b2WBh4-sIv8KxGTr-XnwBSgId0Bzbd0K"
-
-                    # if message.content.startswith("K"):
-                    #     print("Message starts with K")
-                    #     parent = "1SAsO7NWNPoLbWdiLGkLJ2VzZGdSfUZoS"
-
-                    if message.content.startswith("A"):
-                        parent = "1LgHK0BdtsgR4ugm4YEJu0vEGO-TkIRqS"
-
-                    elif message.content.startswith("B"):
-                        parent = "17VgKRdF7mAyMIgH5rI-y5acgohnV5UjB"
-
-                    elif message.content.startswith("C"):
-                        parent = "1LdG3Vi-lrLONes22xKv8exOdf6cAwckK"
-
-                    elif message.content.startswith("D"):
-                        parent = "1PxHfS4Z6V5cL3A2fzflw31A7dIWPdLUW"
-
-                    elif message.content.startswith("W"):
-                        parent = "1SJcovgeO_6NgO4LXDLaRfKiFA5lbs76U"
-
-                    elif message.content.startswith("S"):
-                        parent = "1j7Idf_r_peU52DUo7PdmvftFpaEpPSxa"
-
-                    elif message.content.startswith("U"):
-                        parent = "16_0VQNS3HRLYqtntuVj6BTnCOCtWh1p1"
-
-                    elif message.content.startswith("Z"):
-                        parent = "1gOZ4HoJYQO0j4GeInSjDh3JLElToVUWE"
-
-                    elif message.content.startswith("J"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    elif message.content.startswith("L"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    elif message.content.startswith("M"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-                    
-                    elif message.content.startswith("K"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    elif message.content.startswith("N"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    elif message.content.startswith("O"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    elif message.content.startswith("P"):
-                        parent = "1cuR01joObm8KuBQx5HsIbDtwj8XPWmCN"
-
-                    else:
+                    if not parent:
+                        await message.reply("No Google Drive folder is configured for this prefix")
                         return
 
                     bool = upload_file(parent, DRIVE_SERVICE, file, a.content_type, new_filename)
 
         if bool:
-            await message.reply("Successfully uploaded!")
+            await message.reply(f"Successfully uploaded {new_filename}")
+            await message.delete()
         else:
             await message.reply("Error uploading attachment")
-        
-        # await message.delete()
 
 client.run(TOKEN)
