@@ -109,7 +109,7 @@ async def on_message(message):
 
         if bool:
             await message.reply(f"Successfully uploaded {new_filename}")
-            await message.delete()
+            # await message.delete()
         else:
             await message.reply("Error uploading attachment")
 
