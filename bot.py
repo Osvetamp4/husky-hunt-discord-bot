@@ -6,8 +6,11 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
-load_dotenv()
-TOKEN = None # REPLACE WITH DEV TOKEN
+load_dotenv("husky.env")
+TOKEN = os.getenv("BOT_TOKEN")
+if not TOKEN:
+    raise RuntimeError("BOT_TOKEN is missing from husky.env")
+
 GUILD = None # REPLACE WITH SERVER
 
 creds = service_account.Credentials.from_service_account_file(
